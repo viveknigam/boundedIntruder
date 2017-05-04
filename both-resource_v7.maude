@@ -512,8 +512,7 @@ crl[buff] :
   eq checkMsg(schd, b, T) = schd [owise] .
 
 op goal : Config TSymReal -> Bool .
-op goal : Config TSymR||||||/
-       --- Welcome to Maudeeal RSymInt -> Bool .
+op goal : Config TSymReal RSymInt -> Bool .
 
 
 eq goal(conf, T) = false  [owise] .
