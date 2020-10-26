@@ -1,0 +1,84 @@
+mod SLOWLORIS is
+  inc EXE .
+
+  ops initSlow1 initSlow2 initSlow3 initSlow4 initSlow5 : -> Config .
+
+  eq rMin = 0 .
+
+  op Threshold : -> TSymReal .
+  eq Threshold = tw(3) .
+
+  eq initSlow1 = [ I(0), 0 | none | PR(1) | rr(3) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(4) ]
+                 [ SC(0), 5 , 0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(4) === 10/1 ) and
+                 ( ( tw(1) === 12/1 ) and
+                 ( ( tw(2) === 1/1  ) and
+                 ( ( tw(3) === 2/1   )  and (true)))))) !
+                 ( ( rr(1) === 1  )  and
+                 ( ( rr(2) === 0  )  and
+                 ( ( rr(3) === 100 ) and
+                 ( ( rr(4) === 100 ) and (true))))) .
+
+  eq initSlow2 = [ I(0), 0 | none | PR(1) | rr(3) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(4) ]
+                 [ SC(0), 5 , 0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(4) === 10/1 ) and
+                 ( ( tw(1) === 12/1 ) and
+                 ( ( tw(2) === 1/1  ) and
+                 ( ( tw(3) === 12/1   )  and (true)))))) !
+                 ( ( rr(1) === 1  )  and
+                 ( ( rr(2) === 0  )  and
+                 ( ( rr(3) === 100 ) and
+                 ( ( rr(4) === 100 ) and (true))))) .
+
+  eq initSlow3 = [ I(0), 0 | none | PR(1) | rr(3) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(4) ]
+                 [ SC(0), 5 , 0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(4) === 10/1 ) and
+                 ( ( tw(1) === 12/1 ) and
+                 ( ( tw(2) === 1/1  ) and
+                 ( ( tw(3) === 23/1   )  and (true)))))) !
+                 ( ( rr(1) === 1  )  and
+                 ( ( rr(2) === 0  )  and
+                 ( ( rr(3) === 100 ) and
+                 ( ( rr(4) === 100 ) and (true))))) .
+
+  eq initSlow4 = [ I(0), 0 | none | PR(1) | rr(3) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(4) ]
+                 [ SC(0), 5 , 0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(4) === 10/1 ) and
+                 ( ( tw(1) === 12/1 ) and
+                 ( ( tw(2) === 1/1  ) and
+                 ( ( tw(3) === 24/1   )  and (true)))))) !
+                 ( ( rr(1) === 1  )  and
+                 ( ( rr(2) === 0  )  and
+                 ( ( rr(3) === 100 ) and
+                 ( ( rr(4) === 100 ) and (true))))) .
+
+
+  eq initSlow5 = [ I(0), 0 | none | PR(1) | rr(3) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(4) ]
+                 [ SC(0), 5 , 0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(4) === 10/1 ) and
+                 ( ( tw(1) === 12/1 ) and
+                 ( ( tw(2) === 1/1  ) and
+                 ( ( tw(3) === 35/1   )  and (true)))))) !
+                 ( ( rr(1) === 1  )  and
+                 ( ( rr(2) === 0  )  and
+                 ( ( rr(3) === 100 ) and
+                 ( ( rr(4) === 100 ) and (true))))) .
+
+eq protInit( PR(1) ) = q(ND(0) ? rr(1) , rr(1) ; tw(1) ) .
+
+eq  protNodes( PR(1)  ) = q(ND(0) ? rr(1), rr(2) ; tw(1) )
+                        q(ND(1) ? rr(1), rr(2) ; tw(1) ) .
+
+eq  protTransitions( PR(1)   ) = < ND(0) ? rr(2), rr(2) ; tw(2) -> ND(0) >
+                                 < ND(0) ? rr(2), rr(1) ; tw(2) -> ND(1) > .
+endm

@@ -1,0 +1,85 @@
+
+mod VOIP is
+  inc EXE .
+
+  ops initVoip initVoip1 initVoip2 initVoip3 : -> Config .
+  eq rMin = 0 .
+
+  op Threshold : -> TSymReal .
+  eq Threshold = tw(3) .
+
+ eq initVoip = [ I(0), 0 | none | PR(1) | rr(4) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(5) ]
+                 [ SC(0), 6 , 0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(1) === 40000/1 ) and
+                 ( ( tw(2) === 2/1  ) and
+                 ( ( tw(4) === 2/1  ) and
+                 ( ( tw(3) === 200000/1   )  and (true)))))) !
+                 ( ( rr(1) === 20  )  and
+                 ( ( rr(2) === 1  )  and
+                 ( ( rr(3) === 0 ) and
+                 ( ( rr(4) === 3500 ) and
+                 ( ( rr(5) === 64000 ) and (true)))))) .
+
+*** twice
+ eq initVoip1 = [ I(0), 0 | none | PR(1) | rr(4) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(5) ]
+                 [ SC(0),6,0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(1) === 40/1 ) and
+                 ( ( tw(2) === 1/1000  ) and
+                 ( ( tw(4) === 1/1  ) and
+                 ( ( tw(3) > 0/1   )  and (true)))))) !
+                 ( ( rr(1) === 20  )  and
+                 ( ( rr(2) === 1  )  and
+                 ( ( rr(3) === 0 ) and
+                 ( ( rr(4) === 20 ) and
+                 ( ( rr(5) === 800 ) and (true)))))) .
+
+*** 3 times
+  eq initVoip2 = [ I(0), 0 | none | PR(1) | rr(4) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(5) ]
+                 [ SC(0),6,0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(1) === 40/1 ) and
+                 ( ( tw(2) === 1/1000  ) and
+                 ( ( tw(4) === 1/1  ) and
+                 ( ( tw(3) > 0/1   )  and (true)))))) !
+                 ( ( rr(1) === 20  )  and
+                 ( ( rr(2) === 1  )  and
+                 ( ( rr(3) === 0 ) and
+                 ( ( rr(4) === 20 ) and
+                 ( ( rr(5) === 1200 ) and (true)))))) .
+
+
+ eq initVoip3 = [ I(0), 0 | none | PR(1) | rr(4) | tw(4) ]
+                 [ S(0), 0 | none | PR(1) | rr(5) ]
+                 [ SC(0),6,0 | none | none ] ! tt(4) ! none !
+                 ( ( tt(4) >= 0/1   ) and
+                 ( ( tw(1) === 40/1 ) and
+                 ( ( tw(2) === 1/1000  ) and
+                 ( ( tw(4) === 1/1  ) and
+                 ( ( tw(3) > 0/1   )  and (true)))))) !
+                 ( ( rr(1) === 20  )  and
+                 ( ( rr(2) === 1  )  and
+                 ( ( rr(3) === 0 ) and
+                 ( ( rr(4) === 20 ) and
+                 ( ( rr(5) === 1600 ) and (true)))))) .
+
+  eq protInit(PR(1)) = q( ND(0) ? rr(1), rr(2) ; tw(1) ) .
+
+  eq protNodes(PR(1)) = q( ND(0) ? rr(1), rr(3) ; tw(1) )
+                        q( ND(1) ? rr(1), rr(3) ; tw(1) )
+                        q( ND(2) ? rr(1), rr(3) ; tw(1) )
+                        q( ND(3) ? rr(1), rr(3) ; tw(1) )
+                        q( ND(4) ? rr(1), rr(3) ; tw(1) )
+                        q( ND(5) ? rr(1), rr(3) ; tw(1) ) .
+
+  eq protTransitions(PR(1)) = < ND(0) ? rr(3), rr(2) ; tw(2) -> ND(1) >
+                              < ND(1) ? rr(3), rr(2) ; tw(2) -> ND(2) >
+                              < ND(2) ? rr(3), rr(2) ; tw(2) -> ND(3) >
+                              < ND(3) ? rr(3), rr(2) ; tw(2) -> ND(4) >
+                              < ND(4) ? rr(3), rr(2) ; tw(2) -> ND(5) > .
+endm
+
