@@ -116,8 +116,7 @@ fmod CONFIG is
   op depleted : Sid RSymIntL TSymReal -> Marker [ctor] .
 
   sort Config .
-  op _!_!_!_!_ : PlayerConf TimeSym MSet Boolean Boolean -> Config [ctor] .
-
+  op _!_!_!_!_!_!_ : PlayerConf TimeSym MSet Boolean Boolean Nat Nat -> Config [ctor] .
 
 endfm
 

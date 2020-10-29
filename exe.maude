@@ -16,6 +16,7 @@ mod EXE is
   var resS : ResourceS .
   var r1 r2 : Rid .
   vars i j k l m n n1 n2 n3 band worker : Nat .
+  vars pxsB msgs1B : Nat .
   vars b b' b2 b2' b3 b3' b3'' b4 b4' b4'' : Boolean .
   vars timeoutT recovery delay T T1 T2 T3 TRec tNew tOld : TSymReal .
   vars rs1 rs2 rs3 rs4 rs' rs'' rs1' rsm rSym instances rs3k rs2k rs4k rs5k : RSymInt .
@@ -39,17 +40,17 @@ mod EXE is
 op rMin : -> Integer .
 op putMarker : Config -> MSet .
 
-ceq putMarker( [ sid, i | pxs' | prids' | rs1 ] pc ! T ! none ! b ! b2 ) = depleted(sid, rs1, T)
+ceq putMarker( [ sid, i | pxs' | prids' | rs1 ] pc ! T ! none ! b ! b2 ! pxsB ! msgs1B ) = depleted(sid, rs1, T)
 if b3' := ( (rs1 <= rMin) and (b2))
 /\ b3 := simplify(b3')
 /\ metaCheck(['EXE], toVarsB( b3 )) .
 
-ceq putMarker( [sid, i | pxs' | prids' | rs1] pc ! T ! depleted(sid, rsil ,T1) ! b ! b2 ) = depleted(sid, rsil ; rs1 ,T1)
+ceq putMarker( [sid, i | pxs' | prids' | rs1] pc ! T ! depleted(sid, rsil ,T1) ! b ! b2 ! pxsB ! msgs1B ) = depleted(sid, rsil ; rs1 ,T1)
 if b3' := toBoolean( rsil ; rs1, b2)
 /\ b3 := simplify(b3')
 /\ metaCheck(['EXE], toVarsB( b3)) .
 
-eq putMarker( pc ! T ! mks ! b ! b2) = none [owise] .
+eq putMarker( pc ! T ! mks ! b ! b2 ! pxsB ! msgs1B) = none [owise] .
 
 op toBoolean : RSymIntL Boolean -> Boolean .
 eq toBoolean( rs1 ; rsil , b ) = toBoolean( rsil, ((rs1 <= rMin) and (b))) .
@@ -76,15 +77,15 @@ crl[pstart] :
     [iid, j | pxs  | prid prids |  rr(l) | TRec ]
     [sid, i | pxs' | prid prids' | rr(m) ]
     [sc, k, n1 | none | msgs2 ]
-    pc ! tt(n) ! mks ! b ! b2
+    pc ! tt(n) ! mks ! b ! b2 ! pxsB ! msgs1B 
     =>
     [ iid, s j | px(prid, nid, rr(s s k), n1) pxs | prid prids | rr(k) | TRec]
     [ sid, s i | px(prid, nid, rr(s s k), n1) pxs | prid prids' | rr(s k)]
     [sc, s s s s s k, s n1 | none | msgs2
     msg( tt(s n) + timeoutT ; prid , n1 <- timeout( rr(s s s s k), rr(s s s k) ) ) ]
-    pc ! tt(s n) ! mks' ! b3 ! b4
-    if q(nid ? rs1, rs2 ; timeoutT ) := protInit(prid)
-    --- /\ numPxs(pxs) < 1
+    pc ! tt(s n) ! mks' ! b3 ! b4 ! pxsB ! msgs1B
+    if (numPxs(pxs) <= pxsB or pxsB == 0)
+    /\ q(nid ? rs1, rs2 ; timeoutT ) := protInit(prid)
     /\ ((numPxs(pxs) >= 1 and numMsgs(msgs2) >= 1) or n == 4)
     /\ b3' := ((tt(s n) >= 0/1) and ( (tt(s n) >= tt(n)) and (b)))
     /\ b3'' := advanceTime(tt(s n),msgs2,b3')
@@ -104,13 +105,13 @@ crl[pstart] :
                               [ sid, s i | px(prid, nid, rr(s s k), n1) pxs | prid prids' | rr(s k)]
                               [sc, s s s s s k, s n1 | none | msgs2
                               msg( tt(s n) + timeoutT ; prid , n1 <- timeout( rr(s s s s k), rr(s s s k) ) ) ]
-                              pc ! tt(s n) ! mks ! b3 ! b4  ) .
+                              pc ! tt(s n) ! mks ! b3 ! b4 ! pxsB ! msgs1B ) .
 
 crl[pcontinue] :
   [iid, j | px(prid, nid, instances, n1) pxs | prids |   rr(l) | TRec ]
   [sid, i | px(prid, nid, instances, n1) pxs' | prids' | rr(m) ]
   [sc, k, n2 | none | msgs2 msg(T ; prid , n1 <- timeout(rs', rs'') ) ]
-  pc ! tt(n) ! mks ! b ! b2
+  pc ! tt(n) ! mks ! b ! b2 ! pxsB ! msgs1B
   =>
   [iid, s j | px(prid, nid2, instances, n1) pxs | prids | rr(k) | TRec ]
   [sid, s i | px(prid, nid2, instances, n1) pxs' | prids' | rr( s k) ]
@@ -118,8 +119,9 @@ crl[pcontinue] :
   msg( tt(s n) + timeoutT ; prid , n1 <- timeout(rr(s s s s s k), rr(s s s k)))
   --- msg( tt(s n) + T1 ; prid , n1 <- recover( sid, rr(s s s s k)))
   msg( tt(s n) + TRec ; prid , n1 <- recover( iid, rr(s s k))) ]
-  pc ! tt(s n) ! mks' ! b3 ! b4
-  if  < nid ? rs1, rs2 ; T1 -> nid2 > trsn  := protTransitions(prid)
+  pc ! tt(s n) ! mks' ! b3 ! b4 ! pxsB ! msgs1B
+  if (numPxs(px(prid, nid, instances, n1) pxs) <= pxsB or pxsB == 0)
+  /\ < nid ? rs1, rs2 ; T1 -> nid2 > trsn  := protTransitions(prid)
   /\  q(nid2 ? rs3, rs4 ; timeoutT) nds := protNodes(prid)
   /\ b3' := (T > tt(s n) and ((tt(s n) >= 0/1) and ( (tt(s n) >= tt(n))  and (b))))
   /\ b3'' := advanceTime(tt(s n),msgs2,b3')
@@ -137,57 +139,61 @@ crl[pcontinue] :
   /\ metaCheck(['EXE], toVarsB(b4))
   /\ metaCheck(['EXE], toVarsB(b3))
   /\ mks' := putMarker( [sid, s i | px(prid, nid2, instances, n1) pxs' | prids' | rr( s k) ]
-                           pc ! tt(s n) ! mks ! b3 ! b4   ) .
+                           pc ! tt(s n) ! mks ! b3 ! b4 ! pxsB ! msgs1B  ) .
 
 crl[ptimeout]:
     [iid, j | px(prid, nid, rSym, n1) pxs | prids | rr(l) | TRec ]
     [sid, i | px(prid, nid, rSym, n1) pxs' | prids' | rr(m) ]
     [sc, k, n2 | msgs msg(T ; prid , n1 <- timeout(rs1, rs2)) | msgs2 ]
-    pc ! tt(n) ! mks ! b ! b2
+    pc ! tt(n) ! mks ! b ! b2 ! pxsB ! msgs1B
     =>
     [iid, s j | pxs | prids |   rr(k) | TRec]
     [sid, s i | pxs' | prids' | rr(s k) ]
-    [sc, s s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks' ! b ! b4
-    if b4' := ( ( rr(m) + rs1  === rr(s k) ) and  ( ( rr(l) + rs2 ===  rr(k) )  and  (b2)))
+    [sc, s s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks' ! b ! b4 ! pxsB ! msgs1B
+    if (numPxs(px(prid, nid, rSym, n1) pxs) <= pxsB or pxsB == 0)
+    /\ (numMsgs(msgs msg(T ; prid , n1 <- timeout(rs1, rs2))) <= msgs1B or msgs1B == 0)  
+    /\ b4' := ( ( rr(m) + rs1  === rr(s k) ) and  ( ( rr(l) + rs2 ===  rr(k) )  and  (b2)))
     /\ (numMsgs(msgs msgs2) >= 1 or n == 4)
     /\ b4 := simplify(b4')
     /\ metaCheck(['EXE], toVarsB(b4))
     /\ mks' := putMarker(  [iid, s j | pxs | prids | rr(k) | TRec]
                            [sid, s i | pxs' | prids' | rr(s k) ]
-                           [sc, s s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks ! b ! b4  ) .
+                           [sc, s s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks ! b ! b4 ! pxsB ! msgs1B ) .
 
 
 crl[irecover] :
     [iid, j | pxs | prids | rr(l) | TRec ]
-    [sc, k, n2 | msgs msg(T ; prid , n1 <- recover(iid, rs3) ) | msgs2 ] pc ! tt(n) ! mks ! b ! b2
+    [sc, k, n2 | msgs msg(T ; prid , n1 <- recover(iid, rs3) ) | msgs2 ] pc ! tt(n) ! mks ! b ! b2 ! pxsB ! msgs1B
     =>
     [iid, s j | pxs | prids | rr(k) | TRec ]
-    [sc, s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks ! b ! b4
+    [sc, s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks ! b ! b4 ! pxsB ! msgs1B
     if b4' := ( (rr(l) + rs3 === rr(k)) and (b2))
     /\ (numMsgs(msgs msgs2) >= 1 or n == 4)
     /\ b4 := simplify(b4')
     /\ metaCheck(['EXE], toVarsB(b4)) .
 
 crl[srecover] :
-
   [sid, i | pxs | prids | rr(l) ]
-  [sc, k, n2 | msgs msg(T ; prid , n1 <- recover(sid, rs3) ) | msgs2 ] pc ! tt(n) ! mks ! b ! b2
+  [sc, k, n2 | msgs 
+         msg(T ; prid , n1 <- recover(sid, rs3) ) | msgs2 ] pc ! 
+  tt(n) ! mks ! b ! b2 ! pxsB ! msgs1B
   =>
   [sid, s i | pxs | prids | rr(k) ]
-  [sc, s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks' ! b ! b4
+  [sc, s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks' ! b ! b4 ! pxsB ! msgs1B
   if b4' := ( (rr(l) + rs3 === rr(k)) and (b2))
   /\ (numMsgs(msgs msgs2) >= 1 or n == 4)
   /\ b4 := simplify(b4')
   /\ metaCheck(['EXE], toVarsB(b4))
   /\ mks' := putMarker(     [sid, s i | pxs | prids | rr(k) ]
-                            [sc, s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks ! b ! b4     )  .
+       [sc, s k, n2 | msgs | msgs2 ] pc ! tt(n) ! mks ! b ! b4 ! pxsB ! msgs1B )  .
 
 crl[buff] :
     [sc, k, n2 | none | msgs2 msg(T ; prid , n1 <- evt)] pc
-    ! tt(n) ! mks ! b ! b2
+    ! tt(n) ! mks ! b ! b2 ! pxsB ! msgs1B
     =>
-    schd pc ! tt(s n) ! mks ! b3 ! b2
+    schd pc ! tt(s n) ! mks ! b3 ! b2 ! pxsB ! msgs1B
     if schd := checkMsg([sc, k, n2 | msg(T ; prid , n1 <- evt) | msgs2], b, T)
+    /\ numMsgs(getMsg1(schd)) == msgs1B or msgs1B == 0
     /\ b3' := ((tt(s n) >= 0/1) and ( (tt(s n) >= tt(n)) and ( (tt(s n) >= T) and (b))))
     --- /\ numMsgs(getMsg1(schd)) == 1
     /\ b3'' := advanceTime(tt(s n),getMsg2(schd),b3')
@@ -210,7 +216,7 @@ op goal : Config TSymReal RSymInt -> Bool .
 eq goal(conf, T) = false  [owise] .
 ceq goal( [sid, i | pxs | prids | rs1]
           [sc, k, n2 | none | msgs2 ]
-           pc ! T ! depleted(sid, rsil ,T3) mks ! b ! b2, T1) = true
+           pc ! T ! depleted(sid, rsil ,T3) mks ! b ! b2 ! pxsB ! msgs1B, T1) = true
 if b3' := ( ( T - T3 >= T1   ) and  (b))
 --- /\ b3'' := advanceTime(T,msgs2,b3')
 --- /\ b3'' := b3'
