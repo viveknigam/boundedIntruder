@@ -72,7 +72,7 @@ op remTimeOut : Prid MsgS  -> MsgS .
 eq remTimeOut(prid, msg(t:TSymReal ; prid , n1 <- timeout(rs1,rs2)) msgs2) = msgs2 .
 eq remTimeOut(prid, msgs2) = msgs2 [owise] .
 
---- timeout(rs1, rs2) indicates that, when the protocol finishes, the server recover rs1 resourcers, and the client rs2 .
+--- timeout(rs1, rs2) denotes that, when the protocol finishes, the server recover rs1 resourcers, and the client rs2 .
 crl[pstart] :
     [iid, j | pxs  | prid prids |  rr(l) | TRec ]
     [sid, i | pxs' | prid prids' | rr(m) ]

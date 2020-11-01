@@ -1,0 +1,96 @@
+mod TLS-RENEGOTIATION is
+  inc EXE .
+
+  vars pxsB msgs1B : Nat .
+
+  ops tls1 : Nat Nat -> Config .
+
+  eq rMin = 0 .
+
+  op Threshold : -> TSymReal .
+  eq Threshold = tw(3) .
+
+**** States:
+*** ND(0): initial state
+*** ND(1): Has fresh key
+*** ND(2): Key renegotiation
+
+*** Transitions:
+*** T1: ND(0) --> ND(1): Generates a key
+*** T2: N(1) --> ND(2): Renegotiates a key
+*** T3: N(2) --> ND(1): Has fresh key
+
+eq protInit( PR(1) ) = q(ND(0) ? rr(1), rr(2) ; tw(1) ) .
+
+*** Typical values
+*** rr(1) == 0 and rr(2) == 1
+*** rr(3) == 1 and rr(4) == 0
+*** rr(5) == 10 and rr(6) == 0
+*** tw(1) = 1000
+*** tw(2) = 1000
+*** tw(3) = 10 
+  --- the protocol is supposed to timeout or move to has key
+  --- In this way we model that some protocol shall move forward.
+  --- Could be seen as a critical state definition.
+
+
+eq protNodes( PR(1)  ) 
+   = q(ND(0) ? rr(1), rr(2) ; tw(1) )
+     q(ND(1) ? rr(3), rr(4) ; tw(2) ) 
+     q(ND(2) ? rr(5), rr(6) ; tw(3) ) .
+
+*** Typical values
+*** rr(7) == rr(9) == rr(11) == 0
+*** rr(8) == rr(10) == rr(12) == 1
+
+eq protTransitions( PR(1)   ) 
+   = < ND(0) ? rr(7), rr(8) ; tw(4) -> ND(1) >
+     < ND(1) ? rr(9), rr(10) ; tw(5) -> ND(2) >
+     < ND(2) ? rr(11), rr(12) ; tw(6) -> ND(1) > .
+
+eq tls1(pxsB,msgs1B) 
+ = [ I(0), 0 | none | PR(1) | rr(13) | tw(4) ]
+   [ S(0), 0 | none | PR(1) | rr(14) ]
+   [ SC(0), 15 , 0 | none | none ] ! tt(4) 
+   ! none !
+   ( ( tt(4) >= 0/1   ) and
+   ( ( tw(4) === 10/1 ) and
+   ( ( tw(1) === 1000/1 ) and
+   ( ( tw(2) === 1000/1  ) and
+   ( ( tw(3) === 10/1   )  and (true)))))) !
+   ( ( rr(1) === 0  )  and
+   ( ( rr(2) === 1  )  and
+   ( ( rr(3) === 1 ) and
+   ( ( rr(4) === 0 ) and
+   ( ( rr(5) === 10 ) and
+   ( ( rr(6) === 0 ) and
+   ( ( rr(7) === 0 ) and
+   ( ( rr(8) === 1 ) and
+   ( ( rr(9) === 0 ) and
+   ( ( rr(10) === 1 ) and
+   ( ( rr(11) === 0 ) and
+   ( ( rr(12) === 1 ) and
+   ( ( rr(13) === 100 ) and
+   ( ( rr(14) === 100 ) 
+       and (true)))))))))))))))
+   ! pxsB ! msgs1B .
+
+endm
+
+eof
+
+search [1] in TLS-RENEGOTIATION : tls1(0, 0) =>* conf:Config such that goal(conf:Config, Threshold) = (true).Bool .
+
+Solution 1 (state 49)
+states: 50  rewrites: 54644 in 857ms cpu (864ms real) (63760 rewrites/second)
+conf:Config --> ([S(0),2 | px(PR(1), ND(1), rr(17), 0) | PR(1) | rr(21)] [SC(0),27,1 | none | msg(tt(6) + tw(2) ; PR(1),0 <- timeout(rr(25), rr(23)))] [I(0),3 |
+    px(PR(1), ND(1), rr(17), 0) | PR(1) | rr(26) | tw(4)]) ! tt(7) ! depleted(S(0), rr(21), tt(6)) ! tt(7) < tt(6) + tw(2) and (tt(7) >= (0/1).Real and (tt(7) >=
+    tt(6) and (tt(7) >= tt(6) + tw(4) and (tt(5) + tw(1) > tt(6) and (tt(6) >= (0/1).Real and (tt(6) >= tt(5) and (tt(5) >= (0/1).Real and (tt(5) >= tt(4) and (
+    tt(4) >= (0/1).Real and (tw(4) === (10/1).Real and (tw(1) === (1000/1).Real and (tw(2) === (1000/1).Real and (tw(3) === (10/1).Real and true))))))))))))) !
+    rr(20) + rr(22) === rr(26) and (rr(22) === rr(8) * rr(17) and (rr(23) === rr(4) * rr(17) and (rr(15) + rr(18) - rr(22) - rr(23) === rr(20) and (rr(20) >= (
+    0).Integer and (rr(24) === rr(7) * rr(17) and (rr(25) === rr(3) * rr(17) and (rr(16) + rr(19) - rr(24) - rr(25) === rr(21) and (rr(21) >= (0).Integer and (
+    rr(17) > (0).Integer and (rr(18) === rr(2) * rr(17) and (rr(13) - rr(18) === rr(15) and (rr(15) >= (0).Integer and (rr(19) === rr(1) * rr(17) and (rr(14) -
+    rr(19) === rr(16) and (rr(16) >= (0).Integer and (rr(1) === (0).Integer and (rr(2) === (1).Integer and (rr(3) === (1).Integer and (rr(4) === (0).Integer and
+    (rr(5) === (10).Integer and (rr(6) === (0).Integer and (rr(7) === (0).Integer and (rr(8) === (1).Integer and (rr(9) === (0).Integer and (rr(10) === (
+    1).Integer and (rr(11) === (0).Integer and (rr(12) === (1).Integer and (rr(13) === (100).Integer and (rr(14) === (100).Integer and
+    true))))))))))))))))))))))))))))) ! 0 ! 0

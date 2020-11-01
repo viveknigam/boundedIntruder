@@ -63,7 +63,13 @@ fmod CONFIG is
   subsort Node < NodeS .
   op none : -> NodeS [ctor] .
   op __ : NodeS NodeS -> NodeS [ctor assoc comm id: none] .
+
   op q(_?_,_;_) : Nid RSymInt RSymInt TSymReal -> Node [ctor] .
+  *** State Parameters are:
+  *** - Name
+  *** - Resources needed by the service to keep the state
+  *** - Resources needed by the client to keep the state
+  *** - Timeout
 
   sort NTransition NTransitionS .
   subsort NTransition < NTransitionS .
@@ -71,6 +77,12 @@ fmod CONFIG is
   op __ : NTransitionS NTransitionS -> NTransitionS [ctor assoc comm id: none] .
   op <_?_,_;_->_ > : Nid RSymInt RSymInt TSymReal Nid -> NTransition [ctor] .
   ---  < N1 ? R1, R2 ; T1, T2 --> N2   >
+  *** Transition Parameters
+  *** State Origin
+  *** Resources required by the service to carry out the transition
+  *** Resources required by the client to carry out the transition
+  *** Time to carry out transition, not being used.
+  *** Resulting state.
 
   op complete : -> Nid [ctor] .
   op protInit : Prid -> Node [ctor] .
