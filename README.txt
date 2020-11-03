@@ -4,7 +4,11 @@ such as Slowloris.
 
 The accompanying paper
 
-Abraão Aires Urquiza, Musab A. AlTurki, Max I. Kanovich, Tajana Ban Kirigin, Vivek Nigam, Andre Scedrov, and Carolyn L. Talcott. Resource-Bounded Intruders in Denial of Service Attacks. In 32nd IEEE Computer Security Foundations Symposium, CSF 2019, Hoboken, NJ, USA, June 25-28, 2019, pp. 382–396, 2019.
+Abraão Aires Urquiza, Musab A. AlTurki, Max I. Kanovich, 
+Tajana Ban Kirigin, Vivek Nigam, Andre Scedrov, and Carolyn L. Talcott.
+Resource-Bounded Intruders in Denial of Service Attacks. 
+In 32nd IEEE Computer Security Foundations Symposium, 
+CSF 2019, Hoboken, NJ, USA, June 25-28, 2019, pp. 382–396, 2019.
 
 and the submitted journal paper describe the foundations of the problem as 
 well as the design choices for the construction of the tool
@@ -44,7 +48,7 @@ Sample Execution:
 
 This will load the basic machinery.
  
- * Load our verification problem, e.g., the ones in the directory example:
+ * Load your verification problem, e.g., the ones in the directory example:
 
 Maude> load examples/slowloris.maude
 
